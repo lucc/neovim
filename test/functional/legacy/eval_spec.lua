@@ -7,13 +7,13 @@ local feed, insert, source = helpers.feed, helpers.insert, helpers.source
 local clear, execute, expect = helpers.clear, helpers.execute, helpers.expect
 local eq, eval, wait = helpers.eq, helpers.eval, helpers.wait
 
-describe('eval', function()
+describe('various eval features', function()
   setup(clear)
   teardown(function()
     os.remove('test.out')
   end)
 
-  it('is working', function()
+  it('are working', function()
     insert([[
       012345678
       012345678
@@ -74,11 +74,13 @@ describe('eval', function()
     execute('AR "')
     execute([[let @" = "abc\n"]])
     eq({'"', 'V', 'abc\n', "['abc']", 'abc\n', "['abc']"}, eval([[RegInfo('"')]]))
+    source([[call RegInfo('"')]])
+    source([[call AppendRegContents('"')]])
     source('AR "')
     wait()eq(1,2)
     execute([[let @" = "abc\<C-m>"]])
     execute('AR "')
-    eq({'"', 'V', 'abc\x0d\n', "['abc']", 'abc\x0d\n', "['abc']"}, eval([[RegInfo('"')]])) -- TODO
+    eq({'"', 'V', 'abc\r\n', "['abc']", 'abc\r\n', "['abc']"}, eval([[RegInfo('"')]])) -- TODO
     execute([[let @= = '"abc"']])
     eq({'=', 'v', 'abc', "['abc']", '"abc"', [=[['"abc"']]=]}, eval([[RegInfo('=')]]))
     execute('AR =')
