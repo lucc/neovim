@@ -10,36 +10,37 @@ describe('eval', function()
   setup(clear)
 
   it('is working', function()
-    insert([=[
+    insert([[
       012345678
       012345678
       
-      start:]=])
+      start:]])
 
-    execute('so small.vim')
     execute('set encoding=latin1')
     execute('set noswapfile')
     execute('lang C')
-    execute('fun AppendRegContents(reg)')
-    feed([[    call append('$', printf('%s: type %s; value: %s (%s), expr: %s (%s)', a:reg, getregtype(a:reg), getreg(a:reg), string(getreg(a:reg, 0, 1)), getreg(a:reg, 1), string(getreg(a:reg, 1, 1))))<cr>]])
-    feed('endfun<cr>')
-    execute('command -nargs=? AR :call AppendRegContents(<q-args>)')
-    execute('fun SetReg(...)')
-    feed([[    call call('setreg', a:000)<cr>]])
-    feed([=[    call append('$', printf('{{{2 setreg(%s)', string(a:000)[1:-2]))<cr>]=])
-    feed('    call AppendRegContents(a:1)<cr>')
-    feed([[    if a:1 isnot# '='<cr>]])
-    feed([[        execute "silent normal! Go==\n==\e\"".a:1."P"<cr>]])
-    feed('    endif<cr>')
-    feed('endfun<cr>')
-    execute('fun ErrExe(str)')
-    feed([[    call append('$', 'Executing '.a:str)<cr>]])
-    feed('    try<cr>')
-    feed('        execute a:str<cr>')
-    feed('    catch<cr>')
-    feed('        $put =v:exception<cr>')
-    feed('    endtry<cr>')
-    feed('endfun<cr>')
+    source([[
+      fun AppendRegContents(reg)
+          call append('$', printf('%s: type %s; value: %s (%s), expr: %s (%s)', a:reg, getregtype(a:reg), getreg(a:reg), string(getreg(a:reg, 0, 1)), getreg(a:reg, 1), string(getreg(a:reg, 1, 1))))
+      endfun
+      command -nargs=? AR :call AppendRegContents(<q-args>)
+      fun SetReg(...)
+          call call('setreg', a:000)
+          call append('$', printf('{{{2 setreg(%s)', string(a:000)[1:-2]))
+          call AppendRegContents(a:1)
+          if a:1 isnot# '='
+              execute "silent normal! Go==\n==\e\"".a:1."P"
+          endif
+      endfun
+      fun ErrExe(str)
+          call append('$', 'Executing '.a:str)
+          try
+              execute a:str
+          catch
+              $put =v:exception
+          endtry
+      endfun
+    ]])
     execute('fun Test()')
     feed([[$put ='{{{1 let tests'<cr>]])
     -- = 'abc'.
@@ -179,9 +180,9 @@ describe('eval', function()
     execute('endtry')
     -- Function name starting with/without "g:", buffer-local funcref.
     execute('function! g:Foo(n)')
-    execute([[  $put ='called Foo(' . a:n . ')']])
+    execute("  $put ='called Foo(' . a:n . ')'")
     execute('endfunction')
-    execute([[let b:my_func = function('Foo')]])
+    execute("let b:my_func = function('Foo')")
     execute('call b:my_func(1)')
     execute('echo g:Foo(2)')
     execute('echo Foo(3)')
@@ -189,21 +190,21 @@ describe('eval', function()
     execute('so test_eval_func.vim')
     -- Using $ instead of '$' must give an error.
     execute('try')
-    execute([[  call append($, 'foobar')]])
+    execute("  call append($, 'foobar')")
     execute('catch')
     execute('  $put =v:exception')
     execute('endtry')
-    execute([[$put ='{{{1 getcurpos/setpos']])
+    execute("$put ='{{{1 getcurpos/setpos'")
     execute('/^012345678')
     feed('6l:let sp = getcurpos()<cr>')
-    feed([[0:call setpos('.', sp)<cr>]])
+    feed("0:call setpos('.', sp)<cr>")
     feed('jyl:$put<cr>')
-    execute('/^start:/+1,$wq! test.out')
-    -- Vim: et ts=4 isk-=\: fmr=???,???.
-    execute('call getchar()')
+    execute('0,/^start:/ delete')
+    -- Vim: et ts=4 isk-=\: fmr=???,???. TODO does this affect the test?
+    --execute('call getchar()')
 
     -- Assert buffer contents.
-    expect([=[
+    expect([[
       {{{1 let tests
       ": type v; value: abc (['abc']), expr: abc (['abc'])
       ": type V; value: abc]=]..'\x00'..[=[ (['abc']), expr: abc]=]..'\x00'..[=[ (['abc'])
@@ -540,6 +541,6 @@ describe('eval', function()
       Executing call setreg("=", ["1", "2"])
       Vim(call):E883: search pattern and expression register may not contain two or more lines
       Executing call setreg(1, ["", "", [], ""])
-      Vim(call):E730: using List as a String]=])
+      Vim(call):E730: using List as a String]])
   end)
 end)
