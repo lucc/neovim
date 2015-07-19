@@ -144,6 +144,100 @@ describe('various eval features', function()
       =abcI=]])
   end)
 
+  it('Appending single lines with setreg()', function()
+    execute('so test_eval_setup.vim')
+    execute([[call SetReg('A', 'abcAc', 'c')]])
+    execute([[call SetReg('A', 'abcAl', 'l')]])
+    execute([[call SetReg('A', 'abcAc2','c')]])
+    execute([[call SetReg('b', 'abcBc', 'ca')]])
+    execute([[call SetReg('b', 'abcBb', 'ba')]])
+    execute([[call SetReg('b', 'abcBc2','ca')]])
+    execute([[call SetReg('b', 'abcBb2','b50a')]])
+    execute([[call SetReg('C', 'abcCl', 'l')]])
+    execute([[call SetReg('C', 'abcCc', 'c')]])
+    execute([[call SetReg('D', 'abcDb', 'b')]])
+    execute([[call SetReg('E', 'abcEb', 'b')]])
+    execute([[call SetReg('E', 'abcEl', 'l')]])
+    execute([[call SetReg('F', 'abcFc', 'c')]])
+    expect([[
+      
+      {{{2 setreg('A', 'abcAc', 'c')
+      A: type v; value: abcAabcAc (['abcAabcAc']), expr: abcAabcAc (['abcAabcAc'])
+      ==
+      =abcAabcAc=
+      {{{2 setreg('A', 'abcAl', 'l')
+      A: type V; value: abcAabcAcabcAl]].."\x00 (['abcAabcAcabcAl']), expr: abcAabcAcabcAl\x00"..[[ (['abcAabcAcabcAl'])
+      ==
+      abcAabcAcabcAl
+      ==
+      {{{2 setreg('A', 'abcAc2', 'c')
+      A: type v; value: abcAabcAcabcAl]].."\x00abcAc2 (['abcAabcAcabcAl', 'abcAc2']), expr: abcAabcAcabcAl\x00"..[[abcAc2 (['abcAabcAcabcAl', 'abcAc2'])
+      ==
+      =abcAabcAcabcAl
+      abcAc2=
+      {{{2 setreg('b', 'abcBc', 'ca')
+      b: type v; value: abcBabcBc (['abcBabcBc']), expr: abcBabcBc (['abcBabcBc'])
+      ==
+      =abcBabcBc=
+      {{{2 setreg('b', 'abcBb', 'ba')
+      b: type ]]..'\x16'..[[5; value: abcBabcBcabcBb (['abcBabcBcabcBb']), expr: abcBabcBcabcBb (['abcBabcBcabcBb'])
+      ==
+      =abcBabcBcabcBb=
+      {{{2 setreg('b', 'abcBc2', 'ca')
+      b: type v; value: abcBabcBcabcBb]].."\x00abcBc2 (['abcBabcBcabcBb', 'abcBc2']), expr: abcBabcBcabcBb\x00"..[[abcBc2 (['abcBabcBcabcBb', 'abcBc2'])
+      ==
+      =abcBabcBcabcBb
+      abcBc2=
+      {{{2 setreg('b', 'abcBb2', 'b50a')
+      b: type ]].."\x1650; value: abcBabcBcabcBb\x00abcBc2abcBb2 (['abcBabcBcabcBb', 'abcBc2abcBb2']), expr: abcBabcBcabcBb\x00"..[[abcBc2abcBb2 (['abcBabcBcabcBb', 'abcBc2abcBb2'])
+      ==
+      =abcBabcBcabcBb                                    =
+       abcBc2abcBb2
+      {{{2 setreg('C', 'abcCl', 'l')
+      C: type V; value: abcC]].."\x00abcCl\x00 (['abcC', 'abcCl']), expr: abcC\x00abcCl\x00"..[[ (['abcC', 'abcCl'])
+      ==
+      abcC
+      abcCl
+      ==
+      {{{2 setreg('C', 'abcCc', 'c')
+      C: type v; value: abcC]].."\x00abcCl\x00abcCc (['abcC', 'abcCl', 'abcCc']), expr: abcC\x00abcCl\x00"..[[abcCc (['abcC', 'abcCl', 'abcCc'])
+      ==
+      =abcC
+      abcCl
+      abcCc=
+      {{{2 setreg('D', 'abcDb', 'b')
+      D: type ]].."\x165; value: abcD\x00abcDb (['abcD', 'abcDb']), expr: abcD\x00"..[[abcDb (['abcD', 'abcDb'])
+      ==
+      =abcD =
+       abcDb
+      {{{2 setreg('E', 'abcEb', 'b')
+      E: type ]].."\x165; value: abcE\x00abcEb (['abcE', 'abcEb']), expr: abcE\x00"..[[abcEb (['abcE', 'abcEb'])
+      ==
+      =abcE =
+       abcEb
+      {{{2 setreg('E', 'abcEl', 'l')
+      E: type V; value: abcE]].."\x00abcEb\x00abcEl\x00 (['abcE', 'abcEb', 'abcEl']), expr: abcE\x00abcEb\x00abcEl\x00"..[[ (['abcE', 'abcEb', 'abcEl'])
+      ==
+      abcE
+      abcEb
+      abcEl
+      ==
+      {{{2 setreg('F', 'abcFc', 'c')
+      F: type v; value: abcF]].."\x00abcFc (['abcF', 'abcFc']), expr: abcF\x00"..[[abcFc (['abcF', 'abcFc'])
+      ==
+      =abcF
+      abcFc=
+      ]])
+  end)
+
+  it('', function()
+    execute('so test_eval_setup.vim')
+  end)
+
+  it('', function()
+    execute('so test_eval_setup.vim')
+  end)
+
   it('are working', function()
     insert([[
       012345678
@@ -160,21 +254,6 @@ describe('various eval features', function()
     012345678
     
     start:]])
-
-    execute([[$put ='{{{1 Appending single lines with setreg()']])
-    execute([[call SetReg('A', 'abcAc', 'c')]])
-    execute([[call SetReg('A', 'abcAl', 'l')]])
-    execute([[call SetReg('A', 'abcAc2','c')]])
-    execute([[call SetReg('b', 'abcBc', 'ca')]])
-    execute([[call SetReg('b', 'abcBb', 'ba')]])
-    execute([[call SetReg('b', 'abcBc2','ca')]])
-    execute([[call SetReg('b', 'abcBb2','b50a')]])
-    execute([[call SetReg('C', 'abcCl', 'l')]])
-    execute([[call SetReg('C', 'abcCc', 'c')]])
-    execute([[call SetReg('D', 'abcDb', 'b')]])
-    execute([[call SetReg('E', 'abcEb', 'b')]])
-    execute([[call SetReg('E', 'abcEl', 'l')]])
-    execute([[call SetReg('F', 'abcFc', 'c')]])
 
     execute([[$put ='{{{1 Appending NL with setreg()']])
     execute([[call setreg('a', 'abcA2', 'c')]])
