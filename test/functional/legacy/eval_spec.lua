@@ -37,8 +37,9 @@ describe('various eval features', function()
       endfun
 
       fun AppendRegContents(reg)
+      let x = RegInfo(a:reg)
 	call append('$', printf('%s: type %s; value: %s (%s), expr: %s (%s)',
-	  \ RegInfo(a:reg)))
+	  \ x[0], x[1], x[2], x[3], x[4], x[5]))
       endfun
 
       command -nargs=? AR :call AppendRegContents(<q-args>)
