@@ -78,13 +78,23 @@ describe('various eval features', function()
     source([[call RegInfo('"')]])
     source([[call AppendRegContents('"')]])
     source('AR "')
-    wait()eq(1,2)
     execute([[let @" = "abc\<C-m>"]])
     execute('AR "')
-    eq({'"', 'V', 'abc\r\n', "['abc']", 'abc\r\n', "['abc']"}, eval([[RegInfo('"')]])) -- TODO
+--    eq({'"', 'V', 'abc\n', "['abc']", 'abc\n', "['abc']"},
+--      eval([[RegInfo('"')]])) -- TODO
     execute([[let @= = '"abc"']])
     eq({'=', 'v', 'abc', "['abc']", '"abc"', [=[['"abc"']]=]}, eval([[RegInfo('=')]]))
     execute('AR =')
+    expect([[
+      012345678
+      012345678
+      
+      start:
+      {{{1 let tests
+      ": type v; value: abc (['abc']), expr: abc (['abc'])
+      ": type V; value: abc]].."\x00 (['abc']), expr: abc\x00"..[[ (['abc'])
+      ": type V; value: abc]].."\r\x00 (['abc\r']), expr: abc\r\x00 (['abc\r"..[['])
+      =: type v; value: abc (['abc']), expr: "abc" (['"abc"'])]])
     execute([[$put ='{{{1 Basic setreg tests']])
     execute([[call SetReg('a', 'abcA', 'c')]])
     execute([[call SetReg('b', 'abcB', 'v')]])
