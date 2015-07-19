@@ -9,7 +9,6 @@ local eq, eval, wait, write_file = helpers.eq, helpers.eval, helpers.wait, helpe
 
 describe('various eval features', function()
   setup(function()
-    clear()
     write_file('test_eval_setup.vim', [[
       set encoding=latin1
       set noswapfile
@@ -67,6 +66,7 @@ describe('various eval features', function()
       $put ='func Bar exists: ' . exists('*Bar')
       ]])
   end)
+  before_each(clear)
   teardown(function()
     os.remove('test.out')
     os.remove('test_eval_func.vim')
