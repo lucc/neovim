@@ -5,12 +5,29 @@
 local helpers = require('test.functional.helpers')
 local feed, insert, source = helpers.feed, helpers.insert, helpers.source
 local clear, execute, expect = helpers.clear, helpers.execute, helpers.expect
-local eq, eval, wait = helpers.eq, helpers.eval, helpers.wait
+local eq, eval, wait, write_file = helpers.eq, helpers.eval, helpers.wait, helpers.write_file
 
 describe('various eval features', function()
-  setup(clear)
+  setup(function()
+    clear()
+    write_file('test_eval_func.vim', [[
+      " Vim script used in test_eval.in.  Needed for script-local function.
+      
+      func! s:Testje()
+        return "foo"
+      endfunc
+      
+      let Bar = function('s:Testje')
+      
+      $put ='s:Testje exists: ' . exists('s:Testje')
+      $put ='func s:Testje exists: ' . exists('*s:Testje')
+      $put ='Bar exists: ' . exists('Bar')
+      $put ='func Bar exists: ' . exists('*Bar')
+      ]])
+  end)
   teardown(function()
     os.remove('test.out')
+    os.remove('test_eval_func.vim')
   end)
 
   it('are working', function()
