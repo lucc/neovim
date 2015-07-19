@@ -10,34 +10,7 @@ local eq, eval, wait, write_file = helpers.eq, helpers.eval, helpers.wait, helpe
 describe('various eval features', function()
   setup(function()
     clear()
-    write_file('test_eval_func.vim', [[
-      " Vim script used in test_eval.in.  Needed for script-local function.
-      
-      func! s:Testje()
-        return "foo"
-      endfunc
-      
-      let Bar = function('s:Testje')
-      
-      $put ='s:Testje exists: ' . exists('s:Testje')
-      $put ='func s:Testje exists: ' . exists('*s:Testje')
-      $put ='Bar exists: ' . exists('Bar')
-      $put ='func Bar exists: ' . exists('*Bar')
-      ]])
-  end)
-  teardown(function()
-    os.remove('test.out')
-    os.remove('test_eval_func.vim')
-  end)
-
-  it('are working', function()
-    insert([[
-      012345678
-      012345678
-      
-      start:]])
-
-    source([[
+    write_file('test_eval_setup.vim', [[
       set encoding=latin1
       set noswapfile
       lang C
@@ -78,40 +51,78 @@ describe('various eval features', function()
 	  $put =v:exception
 	endtry
       endfun
+      ]])
+    write_file('test_eval_func.vim', [[
+      " Vim script used in test_eval.in.  Needed for script-local function.
+      
+      func! s:Testje()
+        return "foo"
+      endfunc
+      
+      let Bar = function('s:Testje')
+      
+      $put ='s:Testje exists: ' . exists('s:Testje')
+      $put ='func s:Testje exists: ' . exists('*s:Testje')
+      $put ='Bar exists: ' . exists('Bar')
+      $put ='func Bar exists: ' . exists('*Bar')
+      ]])
+  end)
+  teardown(function()
+    os.remove('test.out')
+    os.remove('test_eval_func.vim')
+    os.remove('test_eval_setup.vim')
+  end)
+
+  it('let tests', function()
+    execute('so test_eval_setup.vim')
+    execute([[let @" = 'abc']])
+    eq({'"', 'v', 'abc', "['abc']", 'abc', "['abc']"}, eval([[RegInfo('"')]]))
+    execute('AR "')
+    expect([[
+      
+      ": type v; value: abc (['abc']), expr: abc (['abc'])]])
+    execute([[let @" = "abc\n"]])
+    eq({'"', 'V', 'abc\n', "['abc']", 'abc\n', "['abc']"}, eval([[RegInfo('"')]]))
+    source('AR "')
+    expect([[
+      
+      ": type v; value: abc (['abc']), expr: abc (['abc'])
+      ": type V; value: abc]].."\x00 (['abc']), expr: abc\x00"..[[ (['abc'])]])
+    execute([[let @" = "abc\<C-m>"]])
+    eq({'"', 'V', 'abc\r\n', "['abc\r']", 'abc\r\n', "['abc\r']"}, eval([[RegInfo('"')]]))
+    execute('AR "')
+    expect([[
+      
+      ": type v; value: abc (['abc']), expr: abc (['abc'])
+      ": type V; value: abc]].."\x00 (['abc']), expr: abc\x00"..[[ (['abc'])
+      ": type V; value: abc]].."\r\x00 (['abc\r']), expr: abc\r\x00 (['abc\r"..[['])]])
+    execute([[let @= = '"abc"']])
+    eq({'=', 'v', 'abc', "['abc']", '"abc"', [=[['"abc"']]=]}, eval([[RegInfo('=')]]))
+    execute('AR =')
+    expect([[
+      ": type v; value: abc (['abc']), expr: abc (['abc'])
+      ": type V; value: abc]].."\x00 (['abc']), expr: abc\x00"..[[ (['abc'])
+      ": type V; value: abc]].."\r\x00 (['abc\r']), expr: abc\r\x00 (['abc\r"..[['])
+      =: type v; value: abc (['abc']), expr: "abc" (['"abc"'])]])
+  end)
+
+  it('are working', function()
+    insert([[
+      012345678
+      012345678
+      
+      start:]])
+
+    source([[
+    so test_eval_setup.vim
     ]])
     --execute('fun Test()')
-    execute([[$put ='{{{1 let tests']])
     expect([[
     012345678
     012345678
     
     start:
     {{{1 let tests]])
-    execute([[let @" = 'abc']])
-    eq({'"', 'v', 'abc', "['abc']", 'abc', "['abc']"}, eval([[RegInfo('"')]]))
-    execute('AR "')
-    execute([[let @" = "abc\n"]])
-    eq({'"', 'V', 'abc\n', "['abc']", 'abc\n', "['abc']"}, eval([[RegInfo('"')]]))
-    source([[call RegInfo('"')]])
-    --source([[call AppendRegContents('"')]])
-    source('AR "')
-    execute([[let @" = "abc\<C-m>"]])
-    execute('AR "')
---    eq({'"', 'V', 'abc\n', "['abc']", 'abc\n', "['abc']"},
---      eval([[RegInfo('"')]])) -- TODO
-    execute([[let @= = '"abc"']])
-    eq({'=', 'v', 'abc', "['abc']", '"abc"', [=[['"abc"']]=]}, eval([[RegInfo('=')]]))
-    execute('AR =')
-    expect([[
-      012345678
-      012345678
-      
-      start:
-      {{{1 let tests
-      ": type v; value: abc (['abc']), expr: abc (['abc'])
-      ": type V; value: abc]].."\x00 (['abc']), expr: abc\x00"..[[ (['abc'])
-      ": type V; value: abc]].."\r\x00 (['abc\r']), expr: abc\r\x00 (['abc\r"..[['])
-      =: type v; value: abc (['abc']), expr: "abc" (['"abc"'])]])
 
     execute([[$put ='{{{1 Basic setreg tests']])
     execute([[call SetReg('a', 'abcA', 'c')]])
