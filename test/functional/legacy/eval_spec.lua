@@ -91,6 +91,59 @@ describe('various eval features', function()
       =: type v; value: abc (['abc']), expr: "abc" (['"abc"'])]])
   end)
 
+  it('Basic setreg tests', function()
+    execute('so test_eval_setup.vim')
+    execute([[call SetReg('a', 'abcA', 'c')]])
+    execute([[call SetReg('b', 'abcB', 'v')]])
+    execute([[call SetReg('c', 'abcC', 'l')]])
+    execute([[call SetReg('d', 'abcD', 'V')]])
+    execute([[call SetReg('e', 'abcE', 'b')]])
+    execute([[call SetReg('f', 'abcF', "\<C-v>")]])
+    execute([[call SetReg('g', 'abcG', 'b10')]])
+    execute([[call SetReg('h', 'abcH', "\<C-v>10")]])
+    execute([[call SetReg('I', 'abcI')]])
+    expect([[
+      
+      {{{2 setreg('a', 'abcA', 'c')
+      a: type v; value: abcA (['abcA']), expr: abcA (['abcA'])
+      ==
+      =abcA=
+      {{{2 setreg('b', 'abcB', 'v')
+      b: type v; value: abcB (['abcB']), expr: abcB (['abcB'])
+      ==
+      =abcB=
+      {{{2 setreg('c', 'abcC', 'l')
+      c: type V; value: abcC]].."\x00 (['abcC']), expr: abcC\x00"..[[ (['abcC'])
+      ==
+      abcC
+      ==
+      {{{2 setreg('d', 'abcD', 'V')
+      d: type V; value: abcD]].."\x00 (['abcD']), expr: abcD\x00"..[[ (['abcD'])
+      ==
+      abcD
+      ==
+      {{{2 setreg('e', 'abcE', 'b')
+      e: type ]]..'\x16'..[[4; value: abcE (['abcE']), expr: abcE (['abcE'])
+      ==
+      =abcE=
+      {{{2 setreg('f', 'abcF', ']]..'\x16'..[[')
+      f: type ]]..'\x16'..[[4; value: abcF (['abcF']), expr: abcF (['abcF'])
+      ==
+      =abcF=
+      {{{2 setreg('g', 'abcG', 'b10')
+      g: type ]]..'\x16'..[[10; value: abcG (['abcG']), expr: abcG (['abcG'])
+      ==
+      =abcG      =
+      {{{2 setreg('h', 'abcH', ']]..'\x16'..[[10')
+      h: type ]]..'\x16'..[[10; value: abcH (['abcH']), expr: abcH (['abcH'])
+      ==
+      =abcH      =
+      {{{2 setreg('I', 'abcI')
+      I: type v; value: abcI (['abcI']), expr: abcI (['abcI'])
+      ==
+      =abcI=]])
+  end)
+
   it('are working', function()
     insert([[
       012345678
@@ -106,19 +159,7 @@ describe('various eval features', function()
     012345678
     012345678
     
-    start:
-    {{{1 let tests]])
-
-    execute([[$put ='{{{1 Basic setreg tests']])
-    execute([[call SetReg('a', 'abcA', 'c')]])
-    execute([[call SetReg('b', 'abcB', 'v')]])
-    execute([[call SetReg('c', 'abcC', 'l')]])
-    execute([[call SetReg('d', 'abcD', 'V')]])
-    execute([[call SetReg('e', 'abcE', 'b')]])
-    execute([[call SetReg('f', 'abcF', "\<C-v>")]])
-    execute([[call SetReg('g', 'abcG', 'b10')]])
-    execute([[call SetReg('h', 'abcH', "\<C-v>10")]])
-    execute([[call SetReg('I', 'abcI')]])
+    start:]])
 
     execute([[$put ='{{{1 Appending single lines with setreg()']])
     execute([[call SetReg('A', 'abcAc', 'c')]])
@@ -268,45 +309,6 @@ describe('various eval features', function()
 
     -- Assert buffer contents.
     expect([[
-      {{{1 Basic setreg tests
-      {{{2 setreg('a', 'abcA', 'c')
-      a: type v; value: abcA (['abcA']), expr: abcA (['abcA'])
-      ==
-      =abcA=
-      {{{2 setreg('b', 'abcB', 'v')
-      b: type v; value: abcB (['abcB']), expr: abcB (['abcB'])
-      ==
-      =abcB=
-      {{{2 setreg('c', 'abcC', 'l')
-      c: type V; value: abcC]].."\x00 (['abcC']), expr: abcC\x00"..[[ (['abcC'])
-      ==
-      abcC
-      ==
-      {{{2 setreg('d', 'abcD', 'V')
-      d: type V; value: abcD]].."\x00 (['abcD']), expr: abcD\x00"..[[ (['abcD'])
-      ==
-      abcD
-      ==
-      {{{2 setreg('e', 'abcE', 'b')
-      e: type ]]..'\x16'..[[4; value: abcE (['abcE']), expr: abcE (['abcE'])
-      ==
-      =abcE=
-      {{{2 setreg('f', 'abcF', ']]..'\x16'..[[')
-      f: type ]]..'\x16'..[[4; value: abcF (['abcF']), expr: abcF (['abcF'])
-      ==
-      =abcF=
-      {{{2 setreg('g', 'abcG', 'b10')
-      g: type ]]..'\x16'..[[10; value: abcG (['abcG']), expr: abcG (['abcG'])
-      ==
-      =abcG      =
-      {{{2 setreg('h', 'abcH', ']]..'\x16'..[[10')
-      h: type ]]..'\x16'..[[10; value: abcH (['abcH']), expr: abcH (['abcH'])
-      ==
-      =abcH      =
-      {{{2 setreg('I', 'abcI')
-      I: type v; value: abcI (['abcI']), expr: abcI (['abcI'])
-      ==
-      =abcI=
       {{{1 Appending single lines with setreg()
       {{{2 setreg('A', 'abcAc', 'c')
       A: type v; value: abcAabcAc (['abcAabcAc']), expr: abcAabcAc (['abcAabcAc'])
