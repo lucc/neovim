@@ -1,13 +1,17 @@
 -- Test for various eval features.
--- Note: system clipboard support is not tested. I do not think anybody will thank
--- me for messing with clipboard.
+-- Note: system clipboard support is not tested. I do not think anybody will
+-- thank me for messing with clipboard.
 
 local helpers = require('test.functional.helpers')
 local feed, insert, source = helpers.feed, helpers.insert, helpers.source
 local clear, execute, expect = helpers.clear, helpers.execute, helpers.expect
+local eq, eval, wait = helpers.eq, helpers.eval, helpers.wait
 
 describe('eval', function()
   setup(clear)
+  teardown(function()
+    os.remove('test.out')
+  end)
 
   it('is working', function()
     insert([[
@@ -20,6 +24,7 @@ describe('eval', function()
       set encoding=latin1
       set noswapfile
       lang C
+
       fun RegInfo(reg)
         return [
 	  \ a:reg,
@@ -30,11 +35,14 @@ describe('eval', function()
 	  \ string(getreg(a:reg, 1, 1))
 	  \ ]
       endfun
+
       fun AppendRegContents(reg)
 	call append('$', printf('%s: type %s; value: %s (%s), expr: %s (%s)',
 	  \ RegInfo(a:reg)))
       endfun
+
       command -nargs=? AR :call AppendRegContents(<q-args>)
+
       fun SetReg(...)
           call call('setreg', a:000)
           call append('$', printf('{{{2 setreg(%s)', string(a:000)[1:-2]))
@@ -43,13 +51,14 @@ describe('eval', function()
               execute "silent normal! Go==\n==\e\"".a:1."P"
           endif
       endfun
+
       fun ErrExe(str)
-          call append('$', 'Executing '.a:str)
-          try
-              execute a:str
-          catch
-              $put =v:exception
-          endtry
+	call append('$', 'Executing '.a:str)
+	try
+	  execute a:str
+	catch
+	  $put =v:exception
+	endtry
       endfun
     ]])
     --execute('fun Test()')
@@ -65,10 +74,11 @@ describe('eval', function()
     execute('AR "')
     execute([[let @" = "abc\n"]])
     eq({'"', 'V', 'abc\n', "['abc']", 'abc\n', "['abc']"}, eval([[RegInfo('"')]]))
-    execute('AR "')
+    source('AR "')
+    wait()eq(1,2)
     execute([[let @" = "abc\<C-m>"]])
     execute('AR "')
-    -- eq({'"', 'V', 'abc\x0d\n', "['abc']", 'abc\x0d\n', "['abc']"}, eval([[RegInfo('"')]])) -- TODO
+    eq({'"', 'V', 'abc\x0d\n', "['abc']", 'abc\x0d\n', "['abc']"}, eval([[RegInfo('"')]])) -- TODO
     execute([[let @= = '"abc"']])
     eq({'=', 'v', 'abc', "['abc']", '"abc"', [=[['"abc"']]=]}, eval([[RegInfo('=')]]))
     execute('AR =')
@@ -162,10 +172,10 @@ describe('eval', function()
     execute('delcommand AR')
     execute('call garbagecollect(1)')
 
-    execute('/^start:/+1,$wq! test.out')
-    -- Vim: et ts=4 isk-=\: fmr=???,???.
-    execute('call getchar()')
-    execute('e test.out')
+    execute('/^start:/+1,$w! test.out')
+    -- Vim: et ts=4 isk-=\: fmr=???,???. -- TODO
+    --execute('call getchar()') -- TODO
+    execute('e! test.out')
     execute('%d')
     -- Function name not starting with a capital.
     execute('try')
@@ -174,7 +184,10 @@ describe('eval', function()
     execute('  endfunc')
     execute('catch')
     execute('  $put =v:exception')
+    execute('  let tmp = v:exception')
     execute('endtry')
+    eq('hans', eval('tmp'))
+    eq(1,2)
     -- Function name folowed by #.
     execute('try')
     -- #.
