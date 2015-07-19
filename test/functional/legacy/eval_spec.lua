@@ -268,11 +268,6 @@ describe('various eval features', function()
 
     -- Assert buffer contents.
     expect([[
-      {{{1 let tests
-      ": type v; value: abc (['abc']), expr: abc (['abc'])
-      ": type V; value: abc]].."\x00 (['abc']), expr: abc\x00"..[[ (['abc'])
-      ": type V; value: abc]].."\r\x00 (['abc\r']), expr: abc\r\x00 (['abc\r"..[['])
-      =: type v; value: abc (['abc']), expr: "abc" (['"abc"'])
       {{{1 Basic setreg tests
       {{{2 setreg('a', 'abcA', 'c')
       a: type v; value: abcA (['abcA']), expr: abcA (['abcA'])
