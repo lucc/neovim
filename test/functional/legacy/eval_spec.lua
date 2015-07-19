@@ -76,30 +76,15 @@ describe('various eval features', function()
   it('let tests', function()
     execute('so test_eval_setup.vim')
     execute([[let @" = 'abc']])
-    eq({'"', 'v', 'abc', "['abc']", 'abc', "['abc']"}, eval([[RegInfo('"')]]))
     execute('AR "')
-    expect([[
-      
-      ": type v; value: abc (['abc']), expr: abc (['abc'])]])
     execute([[let @" = "abc\n"]])
-    eq({'"', 'V', 'abc\n', "['abc']", 'abc\n', "['abc']"}, eval([[RegInfo('"')]]))
     source('AR "')
-    expect([[
-      
-      ": type v; value: abc (['abc']), expr: abc (['abc'])
-      ": type V; value: abc]].."\x00 (['abc']), expr: abc\x00"..[[ (['abc'])]])
     execute([[let @" = "abc\<C-m>"]])
-    eq({'"', 'V', 'abc\r\n', "['abc\r']", 'abc\r\n', "['abc\r']"}, eval([[RegInfo('"')]]))
     execute('AR "')
-    expect([[
-      
-      ": type v; value: abc (['abc']), expr: abc (['abc'])
-      ": type V; value: abc]].."\x00 (['abc']), expr: abc\x00"..[[ (['abc'])
-      ": type V; value: abc]].."\r\x00 (['abc\r']), expr: abc\r\x00 (['abc\r"..[['])]])
     execute([[let @= = '"abc"']])
-    eq({'=', 'v', 'abc', "['abc']", '"abc"', [=[['"abc"']]=]}, eval([[RegInfo('=')]]))
     execute('AR =')
     expect([[
+      
       ": type v; value: abc (['abc']), expr: abc (['abc'])
       ": type V; value: abc]].."\x00 (['abc']), expr: abc\x00"..[[ (['abc'])
       ": type V; value: abc]].."\r\x00 (['abc\r']), expr: abc\r\x00 (['abc\r"..[['])
