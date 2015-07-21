@@ -93,6 +93,7 @@ describe('various eval features', function()
 
   it('Basic setreg tests', function()
     execute('so test_eval_setup.vim')
+    insert('{{{1 Basic setreg tests')
     execute([[call SetReg('a', 'abcA', 'c')]])
     execute([[call SetReg('b', 'abcB', 'v')]])
     execute([[call SetReg('c', 'abcC', 'l')]])
@@ -102,8 +103,23 @@ describe('various eval features', function()
     execute([[call SetReg('g', 'abcG', 'b10')]])
     execute([[call SetReg('h', 'abcH', "\<C-v>10")]])
     execute([[call SetReg('I', 'abcI')]])
+
+    feed('Go{{{1 Appending single lines with setreg()<esc>')
+    execute([[call SetReg('A', 'abcAc', 'c')]])
+    execute([[call SetReg('A', 'abcAl', 'l')]])
+    execute([[call SetReg('A', 'abcAc2','c')]])
+    execute([[call SetReg('b', 'abcBc', 'ca')]])
+    execute([[call SetReg('b', 'abcBb', 'ba')]])
+    execute([[call SetReg('b', 'abcBc2','ca')]])
+    execute([[call SetReg('b', 'abcBb2','b50a')]])
+    execute([[call SetReg('C', 'abcCl', 'l')]])
+    execute([[call SetReg('C', 'abcCc', 'c')]])
+    execute([[call SetReg('D', 'abcDb', 'b')]])
+    execute([[call SetReg('E', 'abcEb', 'b')]])
+    execute([[call SetReg('E', 'abcEl', 'l')]])
+    execute([[call SetReg('F', 'abcFc', 'c')]])
     expect([[
-      
+      {{{1 Basic setreg tests
       {{{2 setreg('a', 'abcA', 'c')
       a: type v; value: abcA (['abcA']), expr: abcA (['abcA'])
       ==
@@ -141,26 +157,8 @@ describe('various eval features', function()
       {{{2 setreg('I', 'abcI')
       I: type v; value: abcI (['abcI']), expr: abcI (['abcI'])
       ==
-      =abcI=]])
-  end)
-
-  it('Appending single lines with setreg()', function()
-    execute('so test_eval_setup.vim')
-    execute([[call SetReg('A', 'abcAc', 'c')]])
-    execute([[call SetReg('A', 'abcAl', 'l')]])
-    execute([[call SetReg('A', 'abcAc2','c')]])
-    execute([[call SetReg('b', 'abcBc', 'ca')]])
-    execute([[call SetReg('b', 'abcBb', 'ba')]])
-    execute([[call SetReg('b', 'abcBc2','ca')]])
-    execute([[call SetReg('b', 'abcBb2','b50a')]])
-    execute([[call SetReg('C', 'abcCl', 'l')]])
-    execute([[call SetReg('C', 'abcCc', 'c')]])
-    execute([[call SetReg('D', 'abcDb', 'b')]])
-    execute([[call SetReg('E', 'abcEb', 'b')]])
-    execute([[call SetReg('E', 'abcEl', 'l')]])
-    execute([[call SetReg('F', 'abcFc', 'c')]])
-    expect([[
-      
+      =abcI=
+      {{{1 Appending single lines with setreg()
       {{{2 setreg('A', 'abcAc', 'c')
       A: type v; value: abcAabcAc (['abcAabcAc']), expr: abcAabcAc (['abcAabcAc'])
       ==
@@ -226,8 +224,7 @@ describe('various eval features', function()
       F: type v; value: abcF]].."\x00abcFc (['abcF', 'abcFc']), expr: abcF\x00"..[[abcFc (['abcF', 'abcFc'])
       ==
       =abcF
-      abcFc=
-      ]])
+      abcFc=]])
   end)
 
   it('', function()
