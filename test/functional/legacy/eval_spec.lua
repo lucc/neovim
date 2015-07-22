@@ -524,6 +524,28 @@ describe('various eval features', function()
       ' abcE4b10-4\x00abcE4b10-4-2')
   end)
 
+  it('search and expressions', function()
+    execute('so test_eval_setup.vim')
+    execute([=[call SetReg('/', ['abc/'])]=])
+    execute([=[call SetReg('/', ["abc/\n"])]=])
+    execute([=[call SetReg('=', ['"abc/"'])]=])
+    execute([=[call SetReg('=', ["\"abc/\n\""])]=])
+    expect([[
+      
+      {{{2 setreg('/', ['abc/'])
+      /: type v; value: abc/ (['abc/']), expr: abc/ (['abc/'])
+      ==
+      =abc/=
+      {{{2 setreg('/', ['abc/]]..'\x00'..[['])
+      /: type v; value: abc/]].."\x00 (['abc/\x00']), expr: abc/\x00 (['abc/\x00"..[['])
+      ==
+      =abc/]]..'\x00'..[[=
+      {{{2 setreg('=', ['"abc/"'])
+      =: type v; value: abc/ (['abc/']), expr: "abc/" (['"abc/"'])
+      {{{2 setreg('=', ['"abc/]]..'\x00'..[["'])
+      =: type v; value: abc/]].."\x00 (['abc/\x00"..[[']), expr: "abc/]]..'\x00'..[[" (['"abc/]]..'\x00'..[["'])]])
+  end)
+
   it('', function()
     execute('so test_eval_setup.vim')
   end)
@@ -544,12 +566,6 @@ describe('various eval features', function()
     012345678
     
     start:]])
-
-    execute([[$put ='{{{1 Search and expressions']])
-    execute([=[call SetReg('/', ['abc/'])]=])
-    execute([=[call SetReg('/', ["abc/\n"])]=])
-    execute([=[call SetReg('=', ['"abc/"'])]=])
-    execute([=[call SetReg('=', ["\"abc/\n\""])]=])
 
     execute([[$put ='{{{1 Errors']])
     execute([[call ErrExe('call setreg()')]])
@@ -631,19 +647,6 @@ describe('various eval features', function()
     -- Assert buffer contents.
     expect([[
       
-      {{{1 Search and expressions
-      {{{2 setreg('/', ['abc/'])
-      /: type v; value: abc/ (['abc/']), expr: abc/ (['abc/'])
-      ==
-      =abc/=
-      {{{2 setreg('/', ['abc/]]..'\x00'..[['])
-      /: type v; value: abc/]].."\x00 (['abc/\x00']), expr: abc/\x00 (['abc/\x00"..[['])
-      ==
-      =abc/]]..'\x00'..[[=
-      {{{2 setreg('=', ['"abc/"'])
-      =: type v; value: abc/ (['abc/']), expr: "abc/" (['"abc/"'])
-      {{{2 setreg('=', ['"abc/]]..'\x00'..[["'])
-      =: type v; value: abc/]].."\x00 (['abc/\x00"..[[']), expr: "abc/]]..'\x00'..[[" (['"abc/]]..'\x00'..[["'])
       {{{1 Errors
       Executing call setreg()
       Vim(call):E119: Not enough arguments for function: setreg
