@@ -446,6 +446,84 @@ describe('various eval features', function()
       ' abcD3b50')
   end)
 
+  -- The tests for setting lists with NLs are split into seperate it() blocks
+  -- to make the expect() calls easier to write.  Otherwise the null byte can
+  -- make trouble on a line on it's own.
+  it('setting lists with NLs with setreg(), part 1', function()
+    execute('so test_eval_setup.vim')
+    execute([=[call SetReg('a', ['abcA4-0', "\n", "abcA4-2\n", "\nabcA4-3", "abcA4-4\nabcA4-4-2"])]=])
+    expect(
+     '\n'..
+      "{{{2 setreg('a', ['abcA4-0', '\x00', 'abcA4-2\x00', '\x00abcA4-3', 'abcA4-4\x00abcA4-4-2'])\n"..
+      "a: type V; value: abcA4-0\x00\x00\x00abcA4-2\x00\x00\x00abcA4-3\x00abcA4-4\x00abcA4-4-2\x00 (['abcA4-0', '\x00', 'abcA4-2\x00', '\x00abcA4-3', 'abcA4-4\x00abcA4-4-2']), expr: abcA4-0\x00\x00\x00abcA4-2\x00\x00\x00abcA4-3\x00abcA4-4\x00abcA4-4-2\x00 (['abcA4-0', '\x00', 'abcA4-2\x00', '\x00abcA4-3', 'abcA4-4\x00abcA4-4-2'])\n"..
+      '==\n'..
+      'abcA4-0\n'..
+      '\x00\n'..
+      'abcA4-2\x00\n'..
+      '\x00abcA4-3\n'..
+      'abcA4-4\x00abcA4-4-2\n'..
+      '==')
+  end)
+
+  it('setting lists with NLs with setreg(), part 2', function()
+    execute('so test_eval_setup.vim')
+    execute([=[call SetReg('b', ['abcB4c-0', "\n", "abcB4c-2\n", "\nabcB4c-3", "abcB4c-4\nabcB4c-4-2"], 'c')]=])
+    expect(
+      '\n'..
+      "{{{2 setreg('b', ['abcB4c-0', '\x00', 'abcB4c-2\x00', '\x00abcB4c-3', 'abcB4c-4\x00abcB4c-4-2'], 'c')\n"..
+      "b: type v; value: abcB4c-0\x00\x00\x00abcB4c-2\x00\x00\x00abcB4c-3\x00abcB4c-4\x00abcB4c-4-2 (['abcB4c-0', '\x00', 'abcB4c-2\x00', '\x00abcB4c-3', 'abcB4c-4\x00abcB4c-4-2']), expr: abcB4c-0\x00\x00\x00abcB4c-2\x00\x00\x00abcB4c-3\x00abcB4c-4\x00abcB4c-4-2 (['abcB4c-0', '\x00', 'abcB4c-2\x00', '\x00abcB4c-3', 'abcB4c-4\x00abcB4c-4-2'])\n"..
+      '==\n'..
+      '=abcB4c-0\n'..
+      '\x00\n'..
+      'abcB4c-2\x00\n'..
+      '\x00abcB4c-3\n'..
+      'abcB4c-4\x00abcB4c-4-2=')
+  end)
+
+  it('setting lists with NLs with setreg(), part 3', function()
+    execute('so test_eval_setup.vim')
+    execute([=[call SetReg('c', ['abcC4l-0', "\n", "abcC4l-2\n", "\nabcC4l-3", "abcC4l-4\nabcC4l-4-2"], 'l')]=])
+    expect(
+      '\n'..
+      "{{{2 setreg('c', ['abcC4l-0', '\x00', 'abcC4l-2\x00', '\x00abcC4l-3', 'abcC4l-4\x00abcC4l-4-2'], 'l')\n"..
+      "c: type V; value: abcC4l-0\x00\x00\x00abcC4l-2\x00\x00\x00abcC4l-3\x00abcC4l-4\x00abcC4l-4-2\x00 (['abcC4l-0', '\x00', 'abcC4l-2\x00', '\x00abcC4l-3', 'abcC4l-4\x00abcC4l-4-2']), expr: abcC4l-0\x00\x00\x00abcC4l-2\x00\x00\x00abcC4l-3\x00abcC4l-4\x00abcC4l-4-2\x00 (['abcC4l-0', '\x00', 'abcC4l-2\x00', '\x00abcC4l-3', 'abcC4l-4\x00abcC4l-4-2'])\n"..
+      '==\n'..
+      'abcC4l-0\n'..
+      '\x00\n'..
+      'abcC4l-2\x00\n'..
+      '\x00abcC4l-3\n'..
+      'abcC4l-4\x00abcC4l-4-2\n'..
+      '==')
+  end)
+  it('setting lists with NLs with setreg(), part 4', function()
+    execute('so test_eval_setup.vim')
+    execute([=[call SetReg('d', ['abcD4b-0', "\n", "abcD4b-2\n", "\nabcD4b-3", "abcD4b-4\nabcD4b-4-2"], 'b')]=])
+    expect(
+      '\n'..
+      "{{{2 setreg('d', ['abcD4b-0', '\x00', 'abcD4b-2\x00', '\x00abcD4b-3', 'abcD4b-4\x00abcD4b-4-2'], 'b')\n"..
+      "d: type \x1619; value: abcD4b-0\x00\x00\x00abcD4b-2\x00\x00\x00abcD4b-3\x00abcD4b-4\x00abcD4b-4-2 (['abcD4b-0', '\x00', 'abcD4b-2\x00', '\x00abcD4b-3', 'abcD4b-4\x00abcD4b-4-2']), expr: abcD4b-0\x00\x00\x00abcD4b-2\x00\x00\x00abcD4b-3\x00abcD4b-4\x00abcD4b-4-2 (['abcD4b-0', '\x00', 'abcD4b-2\x00', '\x00abcD4b-3', 'abcD4b-4\x00abcD4b-4-2'])\n"..
+      '==\n'..
+      '=abcD4b-0           =\n'..
+      ' \x00\n'..
+      ' abcD4b-2\x00\n'..
+      ' \x00abcD4b-3\n'..
+      ' abcD4b-4\x00abcD4b-4-2')
+  end)
+  it('setting lists with NLs with setreg(), part 5', function()
+    execute('so test_eval_setup.vim')
+    execute([=[call SetReg('e', ['abcE4b10-0', "\n", "abcE4b10-2\n", "\nabcE4b10-3", "abcE4b10-4\nabcE4b10-4-2"], 'b10')]=])
+    expect(
+      '\n'..
+      "{{{2 setreg('e', ['abcE4b10-0', '\x00', 'abcE4b10-2\x00', '\x00abcE4b10-3', 'abcE4b10-4\x00abcE4b10-4-2'], 'b10')\n"..
+      "e: type \x1610; value: abcE4b10-0\x00\x00\x00abcE4b10-2\x00\x00\x00abcE4b10-3\x00abcE4b10-4\x00abcE4b10-4-2 (['abcE4b10-0', '\x00', 'abcE4b10-2\x00', '\x00abcE4b10-3', 'abcE4b10-4\x00abcE4b10-4-2']), expr: abcE4b10-0\x00\x00\x00abcE4b10-2\x00\x00\x00abcE4b10-3\x00abcE4b10-4\x00abcE4b10-4-2 (['abcE4b10-0', '\x00', 'abcE4b10-2\x00', '\x00abcE4b10-3', 'abcE4b10-4\x00abcE4b10-4-2'])\n"..
+      '==\n'..
+      '=abcE4b10-0=\n'..
+      ' \x00\n'..
+      ' abcE4b10-2\x00\n'..
+      ' \x00abcE4b10-3\n'..
+      ' abcE4b10-4\x00abcE4b10-4-2')
+  end)
+
   it('', function()
     execute('so test_eval_setup.vim')
   end)
@@ -466,13 +544,6 @@ describe('various eval features', function()
     012345678
     
     start:]])
-
-    execute([[$put ='{{{1 Setting lists with NLs with setreg()']])
-    execute([=[call SetReg('a', ['abcA4-0', "\n", "abcA4-2\n", "\nabcA4-3", "abcA4-4\nabcA4-4-2"])]=])
-    execute([=[call SetReg('b', ['abcB4c-0', "\n", "abcB4c-2\n", "\nabcB4c-3", "abcB4c-4\nabcB4c-4-2"], 'c')]=])
-    execute([=[call SetReg('c', ['abcC4l-0', "\n", "abcC4l-2\n", "\nabcC4l-3", "abcC4l-4\nabcC4l-4-2"], 'l')]=])
-    execute([=[call SetReg('d', ['abcD4b-0', "\n", "abcD4b-2\n", "\nabcD4b-3", "abcD4b-4\nabcD4b-4-2"], 'b')]=])
-    execute([=[call SetReg('e', ['abcE4b10-0', "\n", "abcE4b10-2\n", "\nabcE4b10-3", "abcE4b10-4\nabcE4b10-4-2"], 'b10')]=])
 
     execute([[$put ='{{{1 Search and expressions']])
     execute([=[call SetReg('/', ['abc/'])]=])
@@ -560,49 +631,6 @@ describe('various eval features', function()
     -- Assert buffer contents.
     expect([[
       
-      {{{1 Setting lists with NLs with setreg()
-      {{{2 setreg('a', ['abcA4-0', ']].."\x00', 'abcA4-2\x00', '\x00abcA4-3', 'abcA4-4\x00"..[[abcA4-4-2'])
-      a: type V; value: abcA4-0]].."\x00\x00\x00abcA4-2\x00\x00\x00abcA4-3\x00abcA4-4\x00abcA4-4-2\x00 (['abcA4-0', '\x00', 'abcA4-2\x00', '\x00abcA4-3', 'abcA4-4\x00abcA4-4-2']), expr: abcA4-0\x00\x00\x00abcA4-2\x00\x00\x00abcA4-3\x00abcA4-4\x00abcA4-4-2\x00 (['abcA4-0', '\x00', 'abcA4-2\x00', '\x00abcA4-3', 'abcA4-4\x00"..[[abcA4-4-2'])
-      ==
-      abcA4-0
-      ]]..'\x00'..[[
-      abcA4-2]]..'\x00'..[[
-      ]]..'\x00'..[[abcA4-3
-      abcA4-4]]..'\x00'..[[abcA4-4-2
-      ==
-      {{{2 setreg('b', ['abcB4c-0', ']].."\x00', 'abcB4c-2\x00', '\x00abcB4c-3', 'abcB4c-4\x00"..[[abcB4c-4-2'], 'c')
-      b: type v; value: abcB4c-0]].."\x00\x00\x00abcB4c-2\x00\x00\x00abcB4c-3\x00abcB4c-4\x00abcB4c-4-2 (['abcB4c-0', '\x00', 'abcB4c-2\x00', '\x00abcB4c-3', 'abcB4c-4\x00abcB4c-4-2']), expr: abcB4c-0\x00\x00\x00abcB4c-2\x00\x00\x00abcB4c-3\x00abcB4c-4\x00abcB4c-4-2 (['abcB4c-0', '\x00', 'abcB4c-2\x00', '\x00abcB4c-3', 'abcB4c-4\x00"..[[abcB4c-4-2'])
-      ==
-      =abcB4c-0
-      ]]..'\x00'..[[
-      abcB4c-2]]..'\x00'..[[
-      ]]..'\x00'..[[abcB4c-3
-      abcB4c-4]]..'\x00'..[[abcB4c-4-2=
-      {{{2 setreg('c', ['abcC4l-0', ']].."\x00', 'abcC4l-2\x00', '\x00abcC4l-3', 'abcC4l-4\x00"..[[abcC4l-4-2'], 'l')
-      c: type V; value: abcC4l-0]].."\x00\x00\x00abcC4l-2\x00\x00\x00abcC4l-3\x00abcC4l-4\x00abcC4l-4-2\x00 (['abcC4l-0', '\x00', 'abcC4l-2\x00', '\x00abcC4l-3', 'abcC4l-4\x00abcC4l-4-2']), expr: abcC4l-0\x00\x00\x00abcC4l-2\x00\x00\x00abcC4l-3\x00abcC4l-4\x00abcC4l-4-2\x00 (['abcC4l-0', '\x00', 'abcC4l-2\x00', '\x00abcC4l-3', 'abcC4l-4\x00"..[[abcC4l-4-2'])
-      ==
-      abcC4l-0
-      ]]..'\x00'..[[
-      abcC4l-2]]..'\x00'..[[
-      ]]..'\x00'..[[abcC4l-3
-      abcC4l-4]]..'\x00'..[[abcC4l-4-2
-      ==
-      {{{2 setreg('d', ['abcD4b-0', ']].."\x00', 'abcD4b-2\x00', '\x00abcD4b-3', 'abcD4b-4\x00"..[[abcD4b-4-2'], 'b')
-      d: type ]].."\x1619; value: abcD4b-0\x00\x00\x00abcD4b-2\x00\x00\x00abcD4b-3\x00abcD4b-4\x00abcD4b-4-2 (['abcD4b-0', '\x00', 'abcD4b-2\x00', '\x00abcD4b-3', 'abcD4b-4\x00abcD4b-4-2']), expr: abcD4b-0\x00\x00\x00abcD4b-2\x00\x00\x00abcD4b-3\x00abcD4b-4\x00abcD4b-4-2 (['abcD4b-0', '\x00', 'abcD4b-2\x00', '\x00abcD4b-3', 'abcD4b-4\x00"..[[abcD4b-4-2'])
-      ==
-      =abcD4b-0           =
-       ]]..'\x00'..[[
-       abcD4b-2]]..'\x00'..[[
-       ]]..'\x00'..[[abcD4b-3
-       abcD4b-4]]..'\x00'..[[abcD4b-4-2
-      {{{2 setreg('e', ['abcE4b10-0', ']].."\x00', 'abcE4b10-2\x00', '\x00abcE4b10-3', 'abcE4b10-4\x00"..[[abcE4b10-4-2'], 'b10')
-      e: type ]].."\x1610; value: abcE4b10-0\x00\x00\x00abcE4b10-2\x00\x00\x00abcE4b10-3\x00abcE4b10-4\x00abcE4b10-4-2 (['abcE4b10-0', '\x00', 'abcE4b10-2\x00', '\x00abcE4b10-3', 'abcE4b10-4\x00abcE4b10-4-2']), expr: abcE4b10-0\x00\x00\x00abcE4b10-2\x00\x00\x00abcE4b10-3\x00abcE4b10-4\x00abcE4b10-4-2 (['abcE4b10-0', '\x00', 'abcE4b10-2\x00', '\x00abcE4b10-3', 'abcE4b10-4\x00"..[[abcE4b10-4-2'])
-      ==
-      =abcE4b10-0=
-       ]]..'\x00'..[[
-       abcE4b10-2]]..'\x00'..[[
-       ]]..'\x00'..[[abcE4b10-3
-       abcE4b10-4]]..'\x00'..[[abcE4b10-4-2
       {{{1 Search and expressions
       {{{2 setreg('/', ['abc/'])
       /: type v; value: abc/ (['abc/']), expr: abc/ (['abc/'])
