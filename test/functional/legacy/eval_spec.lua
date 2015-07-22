@@ -91,7 +91,7 @@ describe('various eval features', function()
       =: type v; value: abc (['abc']), expr: "abc" (['"abc"'])]])
   end)
 
-  it('Basic setreg tests', function()
+  it('basic setreg() tests', function()
     execute('so test_eval_setup.vim')
     insert('{{{1 Basic setreg tests')
     execute([[call SetReg('a', 'abcA', 'c')]])
@@ -227,7 +227,7 @@ describe('various eval features', function()
       abcFc=]])
   end)
 
-  it('Appending NL with setreg()', function()
+  it('appending NL with setreg()', function()
     execute('so test_eval_setup.vim')
 
     execute([[call setreg('a', 'abcA2', 'c')]])
