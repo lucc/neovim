@@ -283,6 +283,169 @@ describe('various eval features', function()
        ]])
   end)
 
+  it('setting and appending list with setreg()', function()
+    execute('so test_eval_setup.vim')
+
+    execute([[$put ='{{{1 Setting lists with setreg()']])
+    execute([=[call SetReg('a', ['abcA3'], 'c')]=])
+    execute([=[call SetReg('b', ['abcB3'], 'l')]=])
+    execute([=[call SetReg('c', ['abcC3'], 'b')]=])
+    execute([=[call SetReg('d', ['abcD3'])]=])
+    execute([=[call SetReg('e', [1, 2, 'abc', 3])]=])
+    execute([=[call SetReg('f', [1, 2, 3])]=])
+
+    execute([[$put ='{{{1 Appending lists with setreg()']])
+    execute([=[call SetReg('A', ['abcA3c'], 'c')]=])
+    execute([=[call SetReg('b', ['abcB3l'], 'la')]=])
+    execute([=[call SetReg('C', ['abcC3b'], 'lb')]=])
+    execute([=[call SetReg('D', ['abcD32'])]=])
+    execute([=[call SetReg('A', ['abcA32'])]=])
+    execute([=[call SetReg('B', ['abcB3c'], 'c')]=])
+    execute([=[call SetReg('C', ['abcC3l'], 'l')]=])
+    execute([=[call SetReg('D', ['abcD3b'], 'b')]=])
+    expect([[
+      
+      {{{1 Setting lists with setreg()
+      {{{2 setreg('a', ['abcA3'], 'c')
+      a: type v; value: abcA3 (['abcA3']), expr: abcA3 (['abcA3'])
+      ==
+      =abcA3=
+      {{{2 setreg('b', ['abcB3'], 'l')
+      b: type V; value: abcB3]].."\x00 (['abcB3']), expr: abcB3\x00"..[[ (['abcB3'])
+      ==
+      abcB3
+      ==
+      {{{2 setreg('c', ['abcC3'], 'b')
+      c: type ]]..'\x16'..[[5; value: abcC3 (['abcC3']), expr: abcC3 (['abcC3'])
+      ==
+      =abcC3=
+      {{{2 setreg('d', ['abcD3'])
+      d: type V; value: abcD3]].."\x00 (['abcD3']), expr: abcD3\x00"..[[ (['abcD3'])
+      ==
+      abcD3
+      ==
+      {{{2 setreg('e', [1, 2, 'abc', 3])
+      e: type V; value: 1]].."\x002\x00abc\x003\x00 (['1', '2', 'abc', '3']), expr: 1\x002\x00abc\x003\x00"..[[ (['1', '2', 'abc', '3'])
+      ==
+      1
+      2
+      abc
+      3
+      ==
+      {{{2 setreg('f', [1, 2, 3])
+      f: type V; value: 1]].."\x002\x003\x00 (['1', '2', '3']), expr: 1\x002\x003\x00"..[[ (['1', '2', '3'])
+      ==
+      1
+      2
+      3
+      ==
+      {{{1 Appending lists with setreg()
+      {{{2 setreg('A', ['abcA3c'], 'c')
+      A: type v; value: abcA3]].."\x00abcA3c (['abcA3', 'abcA3c']), expr: abcA3\x00"..[[abcA3c (['abcA3', 'abcA3c'])
+      ==
+      =abcA3
+      abcA3c=
+      {{{2 setreg('b', ['abcB3l'], 'la')
+      b: type V; value: abcB3]].."\x00abcB3l\x00 (['abcB3', 'abcB3l']), expr: abcB3\x00abcB3l\x00"..[[ (['abcB3', 'abcB3l'])
+      ==
+      abcB3
+      abcB3l
+      ==
+      {{{2 setreg('C', ['abcC3b'], 'lb')
+      C: type ]].."\x166; value: abcC3\x00abcC3b (['abcC3', 'abcC3b']), expr: abcC3\x00"..[[abcC3b (['abcC3', 'abcC3b'])
+      ==
+      =abcC3 =
+       abcC3b
+      {{{2 setreg('D', ['abcD32'])
+      D: type V; value: abcD3]].."\x00abcD32\x00 (['abcD3', 'abcD32']), expr: abcD3\x00abcD32\x00"..[[ (['abcD3', 'abcD32'])
+      ==
+      abcD3
+      abcD32
+      ==
+      {{{2 setreg('A', ['abcA32'])
+      A: type V; value: abcA3]].."\x00abcA3c\x00abcA32\x00 (['abcA3', 'abcA3c', 'abcA32']), expr: abcA3\x00abcA3c\x00abcA32\x00"..[[ (['abcA3', 'abcA3c', 'abcA32'])
+      ==
+      abcA3
+      abcA3c
+      abcA32
+      ==
+      {{{2 setreg('B', ['abcB3c'], 'c')
+      B: type v; value: abcB3]].."\x00abcB3l\x00abcB3c (['abcB3', 'abcB3l', 'abcB3c']), expr: abcB3\x00abcB3l\x00"..[[abcB3c (['abcB3', 'abcB3l', 'abcB3c'])
+      ==
+      =abcB3
+      abcB3l
+      abcB3c=
+      {{{2 setreg('C', ['abcC3l'], 'l')
+      C: type V; value: abcC3]].."\x00abcC3b\x00abcC3l\x00 (['abcC3', 'abcC3b', 'abcC3l']), expr: abcC3\x00abcC3b\x00abcC3l\x00"..[[ (['abcC3', 'abcC3b', 'abcC3l'])
+      ==
+      abcC3
+      abcC3b
+      abcC3l
+      ==
+      {{{2 setreg('D', ['abcD3b'], 'b')
+      D: type ]].."\x166; value: abcD3\x00abcD32\x00abcD3b (['abcD3', 'abcD32', 'abcD3b']), expr: abcD3\x00abcD32\x00"..[[abcD3b (['abcD3', 'abcD32', 'abcD3b'])
+      ==
+      =abcD3 =
+       abcD32
+       abcD3b]])
+
+    -- From now on we delete the buffer contents after each expect() to make
+    -- the next expect() easier to write.  This is neccessary because null
+    -- bytes on a line by itself don't play well together with the dedent
+    -- function used in expect().
+    execute('%delete')
+    execute([[$put ='{{{1 Appending lists with NL with setreg()']])
+    execute([=[call SetReg('A', ["\n", 'abcA3l2'], 'l')]=])
+    expect(
+      '\n'..
+      '{{{1 Appending lists with NL with setreg()\n'..
+      "{{{2 setreg('A', ['\x00', 'abcA3l2'], 'l')\n"..
+      "A: type V; value: abcA3\x00abcA3c\x00abcA32\x00\x00\x00abcA3l2\x00 (['abcA3', 'abcA3c', 'abcA32', '\x00', 'abcA3l2']), expr: abcA3\x00abcA3c\x00abcA32\x00\x00\x00abcA3l2\x00 (['abcA3', 'abcA3c', 'abcA32', '\x00', 'abcA3l2'])\n"..
+      '==\n'..
+      'abcA3\n'..
+      'abcA3c\n'..
+      'abcA32\n'..
+      '\x00\n'..
+      'abcA3l2\n'..
+      '==')
+    execute('%delete')
+    execute([=[call SetReg('B', ["\n", 'abcB3c2'], 'c')]=])
+    expect(
+      '\n'..
+      "{{{2 setreg('B', ['\x00', 'abcB3c2'], 'c')\n"..
+      "B: type v; value: abcB3\x00abcB3l\x00abcB3c\x00\x00\x00abcB3c2 (['abcB3', 'abcB3l', 'abcB3c', '\x00', 'abcB3c2']), expr: abcB3\x00abcB3l\x00abcB3c\x00\x00\x00abcB3c2 (['abcB3', 'abcB3l', 'abcB3c', '\x00', 'abcB3c2'])\n"..
+      '==\n'..
+      '=abcB3\n'..
+      'abcB3l\n'..
+      'abcB3c\n'..
+      '\x00\n'..
+      'abcB3c2=')
+    execute('%delete')
+    execute([=[call SetReg('C', ["\n", 'abcC3b2'], 'b')]=])
+    expect(
+      '\n'..
+      "{{{2 setreg('C', ['\x00', 'abcC3b2'], 'b')\n"..
+      "C: type \x167; value: abcC3\x00abcC3b\x00abcC3l\x00\x00\x00abcC3b2 (['abcC3', 'abcC3b', 'abcC3l', '\x00', 'abcC3b2']), expr: abcC3\x00abcC3b\x00abcC3l\x00\x00\x00abcC3b2 (['abcC3', 'abcC3b', 'abcC3l', '\x00', 'abcC3b2'])\n"..
+      '==\n'..
+      '=abcC3  =\n'..
+      ' abcC3b\n'..
+      ' abcC3l\n'..
+      ' \x00\n'..
+      ' abcC3b2')
+    execute('%delete')
+    execute([=[call SetReg('D', ["\n", 'abcD3b50'],'b50')]=])
+    expect(
+      '\n'..
+      "{{{2 setreg('D', ['\x00', 'abcD3b50'], 'b50')\n"..
+      "D: type \x1650; value: abcD3\x00abcD32\x00abcD3b\x00\x00\x00abcD3b50 (['abcD3', 'abcD32', 'abcD3b', '\x00', 'abcD3b50']), expr: abcD3\x00abcD32\x00abcD3b\x00\x00\x00abcD3b50 (['abcD3', 'abcD32', 'abcD3b', '\x00', 'abcD3b50'])\n"..
+      '==\n'..
+      '=abcD3                                             =\n'..
+      ' abcD32\n'..
+      ' abcD3b\n'..
+      ' \x00\n'..
+      ' abcD3b50')
+  end)
+
   it('', function()
     execute('so test_eval_setup.vim')
   end)
@@ -303,30 +466,6 @@ describe('various eval features', function()
     012345678
     
     start:]])
-
-    execute([[$put ='{{{1 Setting lists with setreg()']])
-    execute([=[call SetReg('a', ['abcA3'], 'c')]=])
-    execute([=[call SetReg('b', ['abcB3'], 'l')]=])
-    execute([=[call SetReg('c', ['abcC3'], 'b')]=])
-    execute([=[call SetReg('d', ['abcD3'])]=])
-    execute([=[call SetReg('e', [1, 2, 'abc', 3])]=])
-    execute([=[call SetReg('f', [1, 2, 3])]=])
-
-    execute([[$put ='{{{1 Appending lists with setreg()']])
-    execute([=[call SetReg('A', ['abcA3c'], 'c')]=])
-    execute([=[call SetReg('b', ['abcB3l'], 'la')]=])
-    execute([=[call SetReg('C', ['abcC3b'], 'lb')]=])
-    execute([=[call SetReg('D', ['abcD32'])]=])
-    execute([=[call SetReg('A', ['abcA32'])]=])
-    execute([=[call SetReg('B', ['abcB3c'], 'c')]=])
-    execute([=[call SetReg('C', ['abcC3l'], 'l')]=])
-    execute([=[call SetReg('D', ['abcD3b'], 'b')]=])
-
-    execute([[$put ='{{{1 Appending lists with NL with setreg()']])
-    execute([=[call SetReg('A', ["\n", 'abcA3l2'], 'l')]=])
-    execute([=[call SetReg('B', ["\n", 'abcB3c2'], 'c')]=])
-    execute([=[call SetReg('C', ["\n", 'abcC3b2'], 'b')]=])
-    execute([=[call SetReg('D', ["\n", 'abcD3b50'],'b50')]=])
 
     execute([[$put ='{{{1 Setting lists with NLs with setreg()']])
     execute([=[call SetReg('a', ['abcA4-0', "\n", "abcA4-2\n", "\nabcA4-3", "abcA4-4\nabcA4-4-2"])]=])
@@ -421,123 +560,6 @@ describe('various eval features', function()
     -- Assert buffer contents.
     expect([[
       
-      {{{1 Setting lists with setreg()
-      {{{2 setreg('a', ['abcA3'], 'c')
-      a: type v; value: abcA3 (['abcA3']), expr: abcA3 (['abcA3'])
-      ==
-      =abcA3=
-      {{{2 setreg('b', ['abcB3'], 'l')
-      b: type V; value: abcB3]].."\x00 (['abcB3']), expr: abcB3\x00"..[[ (['abcB3'])
-      ==
-      abcB3
-      ==
-      {{{2 setreg('c', ['abcC3'], 'b')
-      c: type ]]..'\x16'..[[5; value: abcC3 (['abcC3']), expr: abcC3 (['abcC3'])
-      ==
-      =abcC3=
-      {{{2 setreg('d', ['abcD3'])
-      d: type V; value: abcD3]].."\x00 (['abcD3']), expr: abcD3\x00"..[[ (['abcD3'])
-      ==
-      abcD3
-      ==
-      {{{2 setreg('e', [1, 2, 'abc', 3])
-      e: type V; value: 1]].."\x002\x00abc\x003\x00 (['1', '2', 'abc', '3']), expr: 1\x002\x00abc\x003\x00"..[[ (['1', '2', 'abc', '3'])
-      ==
-      1
-      2
-      abc
-      3
-      ==
-      {{{2 setreg('f', [1, 2, 3])
-      f: type V; value: 1]].."\x002\x003\x00 (['1', '2', '3']), expr: 1\x002\x003\x00"..[[ (['1', '2', '3'])
-      ==
-      1
-      2
-      3
-      ==
-      {{{1 Appending lists with setreg()
-      {{{2 setreg('A', ['abcA3c'], 'c')
-      A: type v; value: abcA3]].."\x00abcA3c (['abcA3', 'abcA3c']), expr: abcA3\x00"..[[abcA3c (['abcA3', 'abcA3c'])
-      ==
-      =abcA3
-      abcA3c=
-      {{{2 setreg('b', ['abcB3l'], 'la')
-      b: type V; value: abcB3]].."\x00abcB3l\x00 (['abcB3', 'abcB3l']), expr: abcB3\x00abcB3l\x00"..[[ (['abcB3', 'abcB3l'])
-      ==
-      abcB3
-      abcB3l
-      ==
-      {{{2 setreg('C', ['abcC3b'], 'lb')
-      C: type ]].."\x166; value: abcC3\x00abcC3b (['abcC3', 'abcC3b']), expr: abcC3\x00"..[[abcC3b (['abcC3', 'abcC3b'])
-      ==
-      =abcC3 =
-       abcC3b
-      {{{2 setreg('D', ['abcD32'])
-      D: type V; value: abcD3]].."\x00abcD32\x00 (['abcD3', 'abcD32']), expr: abcD3\x00abcD32\x00"..[[ (['abcD3', 'abcD32'])
-      ==
-      abcD3
-      abcD32
-      ==
-      {{{2 setreg('A', ['abcA32'])
-      A: type V; value: abcA3]].."\x00abcA3c\x00abcA32\x00 (['abcA3', 'abcA3c', 'abcA32']), expr: abcA3\x00abcA3c\x00abcA32\x00"..[[ (['abcA3', 'abcA3c', 'abcA32'])
-      ==
-      abcA3
-      abcA3c
-      abcA32
-      ==
-      {{{2 setreg('B', ['abcB3c'], 'c')
-      B: type v; value: abcB3]].."\x00abcB3l\x00abcB3c (['abcB3', 'abcB3l', 'abcB3c']), expr: abcB3\x00abcB3l\x00"..[[abcB3c (['abcB3', 'abcB3l', 'abcB3c'])
-      ==
-      =abcB3
-      abcB3l
-      abcB3c=
-      {{{2 setreg('C', ['abcC3l'], 'l')
-      C: type V; value: abcC3]].."\x00abcC3b\x00abcC3l\x00 (['abcC3', 'abcC3b', 'abcC3l']), expr: abcC3\x00abcC3b\x00abcC3l\x00"..[[ (['abcC3', 'abcC3b', 'abcC3l'])
-      ==
-      abcC3
-      abcC3b
-      abcC3l
-      ==
-      {{{2 setreg('D', ['abcD3b'], 'b')
-      D: type ]].."\x166; value: abcD3\x00abcD32\x00abcD3b (['abcD3', 'abcD32', 'abcD3b']), expr: abcD3\x00abcD32\x00"..[[abcD3b (['abcD3', 'abcD32', 'abcD3b'])
-      ==
-      =abcD3 =
-       abcD32
-       abcD3b
-      {{{1 Appending lists with NL with setreg()
-      {{{2 setreg('A', [']]..'\x00'..[[', 'abcA3l2'], 'l')
-      A: type V; value: abcA3]].."\x00abcA3c\x00abcA32\x00\x00\x00abcA3l2\x00 (['abcA3', 'abcA3c', 'abcA32', '\x00', 'abcA3l2']), expr: abcA3\x00abcA3c\x00abcA32\x00\x00\x00abcA3l2\x00 (['abcA3', 'abcA3c', 'abcA32', '\x00"..[[', 'abcA3l2'])
-      ==
-      abcA3
-      abcA3c
-      abcA32
-      ]]..'\x00'..[[
-      abcA3l2
-      ==
-      {{{2 setreg('B', [']]..'\x00'..[[', 'abcB3c2'], 'c')
-      B: type v; value: abcB3]].."\x00abcB3l\x00abcB3c\x00\x00\x00abcB3c2 (['abcB3', 'abcB3l', 'abcB3c', '\x00', 'abcB3c2']), expr: abcB3\x00abcB3l\x00abcB3c\x00\x00\x00abcB3c2 (['abcB3', 'abcB3l', 'abcB3c', '\x00"..[[', 'abcB3c2'])
-      ==
-      =abcB3
-      abcB3l
-      abcB3c
-      ]]..'\x00'..[[
-      abcB3c2=
-      {{{2 setreg('C', [']]..'\x00'..[[', 'abcC3b2'], 'b')
-      C: type ]].."\x167; value: abcC3\x00abcC3b\x00abcC3l\x00\x00\x00abcC3b2 (['abcC3', 'abcC3b', 'abcC3l', '\x00', 'abcC3b2']), expr: abcC3\x00abcC3b\x00abcC3l\x00\x00\x00abcC3b2 (['abcC3', 'abcC3b', 'abcC3l', '\x00"..[[', 'abcC3b2'])
-      ==
-      =abcC3  =
-       abcC3b
-       abcC3l
-       ]]..'\x00'..[[
-       abcC3b2
-      {{{2 setreg('D', [']]..'\x00'..[[', 'abcD3b50'], 'b50')
-      D: type ]].."\x1650; value: abcD3\x00abcD32\x00abcD3b\x00\x00\x00abcD3b50 (['abcD3', 'abcD32', 'abcD3b', '\x00', 'abcD3b50']), expr: abcD3\x00abcD32\x00abcD3b\x00\x00\x00abcD3b50 (['abcD3', 'abcD32', 'abcD3b', '\x00"..[[', 'abcD3b50'])
-      ==
-      =abcD3                                             =
-       abcD32
-       abcD3b
-       ]]..'\x00'..[[
-       abcD3b50
       {{{1 Setting lists with NLs with setreg()
       {{{2 setreg('a', ['abcA4-0', ']].."\x00', 'abcA4-2\x00', '\x00abcA4-3', 'abcA4-4\x00"..[[abcA4-4-2'])
       a: type V; value: abcA4-0]].."\x00\x00\x00abcA4-2\x00\x00\x00abcA4-3\x00abcA4-4\x00abcA4-4-2\x00 (['abcA4-0', '\x00', 'abcA4-2\x00', '\x00abcA4-3', 'abcA4-4\x00abcA4-4-2']), expr: abcA4-0\x00\x00\x00abcA4-2\x00\x00\x00abcA4-3\x00abcA4-4\x00abcA4-4-2\x00 (['abcA4-0', '\x00', 'abcA4-2\x00', '\x00abcA4-3', 'abcA4-4\x00"..[[abcA4-4-2'])
