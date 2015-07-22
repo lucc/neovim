@@ -589,17 +589,7 @@ describe('various eval features', function()
       
       start:]])
 
-    source([[
-    so test_eval_setup.vim
-    ]])
-    --execute('fun Test()')
-    expect([[
-    012345678
-    012345678
-    
-    start:]])
-
-    --execute('endfun')
+    execute('so test_eval_setup.vim')
 
     execute('delfunction SetReg')
     execute('delfunction AppendRegContents')
