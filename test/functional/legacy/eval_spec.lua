@@ -41,15 +41,6 @@ describe('various eval features', function()
               execute "silent normal! Go==\n==\e\"".a:1."P"
           endif
       endfun
-
-      fun ErrExe(str)
-	call append('$', 'Executing '.a:str)
-	try
-	  execute a:str
-	catch
-	  $put =v:exception
-	endtry
-      endfun
       ]])
     write_file('test_eval_func.vim', [[
       " Vim script used in test_eval.in.  Needed for script-local function.
@@ -546,6 +537,47 @@ describe('various eval features', function()
       =: type v; value: abc/]].."\x00 (['abc/\x00"..[[']), expr: "abc/]]..'\x00'..[[" (['"abc/]]..'\x00'..[["'])]])
   end)
 
+  it('errors', function()
+    source([[
+      fun ErrExe(str)
+	call append('$', 'Executing '.a:str)
+	try
+	  execute a:str
+	catch
+	  $put =v:exception
+	endtry
+      endfun]])
+    execute([[call ErrExe('call setreg()')]])
+    execute([[call ErrExe('call setreg(1)')]])
+    execute([[call ErrExe('call setreg(1, 2, 3, 4)')]])
+    execute([=[call ErrExe('call setreg([], 2)')]=])
+    execute([[call ErrExe('call setreg(1, {})')]])
+    execute([=[call ErrExe('call setreg(1, 2, [])')]=])
+    execute([=[call ErrExe('call setreg("/", ["1", "2"])')]=])
+    execute([=[call ErrExe('call setreg("=", ["1", "2"])')]=])
+    execute([=[call ErrExe('call setreg(1, ["", "", [], ""])')]=])
+    expect([[
+      
+      Executing call setreg()
+      Vim(call):E119: Not enough arguments for function: setreg
+      Executing call setreg(1)
+      Vim(call):E119: Not enough arguments for function: setreg
+      Executing call setreg(1, 2, 3, 4)
+      Vim(call):E118: Too many arguments for function: setreg
+      Executing call setreg([], 2)
+      Vim(call):E730: using List as a String
+      Executing call setreg(1, {})
+      Vim(call):E731: using Dictionary as a String
+      Executing call setreg(1, 2, [])
+      Vim(call):E730: using List as a String
+      Executing call setreg("/", ["1", "2"])
+      Vim(call):E883: search pattern and expression register may not contain two or more lines
+      Executing call setreg("=", ["1", "2"])
+      Vim(call):E883: search pattern and expression register may not contain two or more lines
+      Executing call setreg(1, ["", "", [], ""])
+      Vim(call):E730: using List as a String]])
+  end)
+
   it('', function()
     execute('so test_eval_setup.vim')
   end)
@@ -567,16 +599,6 @@ describe('various eval features', function()
     
     start:]])
 
-    execute([[$put ='{{{1 Errors']])
-    execute([[call ErrExe('call setreg()')]])
-    execute([[call ErrExe('call setreg(1)')]])
-    execute([[call ErrExe('call setreg(1, 2, 3, 4)')]])
-    execute([=[call ErrExe('call setreg([], 2)')]=])
-    execute([[call ErrExe('call setreg(1, {})')]])
-    execute([=[call ErrExe('call setreg(1, 2, [])')]=])
-    execute([=[call ErrExe('call setreg("/", ["1", "2"])')]=])
-    execute([=[call ErrExe('call setreg("=", ["1", "2"])')]=])
-    execute([=[call ErrExe('call setreg(1, ["", "", [], ""])')]=])
     --execute('endfun')
 
     execute('delfunction SetReg')
@@ -645,26 +667,5 @@ describe('various eval features', function()
     --execute('call getchar()')
 
     -- Assert buffer contents.
-    expect([[
-      
-      {{{1 Errors
-      Executing call setreg()
-      Vim(call):E119: Not enough arguments for function: setreg
-      Executing call setreg(1)
-      Vim(call):E119: Not enough arguments for function: setreg
-      Executing call setreg(1, 2, 3, 4)
-      Vim(call):E118: Too many arguments for function: setreg
-      Executing call setreg([], 2)
-      Vim(call):E730: using List as a String
-      Executing call setreg(1, {})
-      Vim(call):E731: using Dictionary as a String
-      Executing call setreg(1, 2, [])
-      Vim(call):E730: using List as a String
-      Executing call setreg("/", ["1", "2"])
-      Vim(call):E883: search pattern and expression register may not contain two or more lines
-      Executing call setreg("=", ["1", "2"])
-      Vim(call):E883: search pattern and expression register may not contain two or more lines
-      Executing call setreg(1, ["", "", [], ""])
-      Vim(call):E730: using List as a String]])
   end)
 end)
