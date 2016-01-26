@@ -213,6 +213,9 @@ describe('various eval features', function()
     execute([[call setreg('d', 'abcD2', 'V')]])
     execute([[call setreg('e', 'abcE2', 'b')]])
     execute([[call setreg('f', 'abcF2', "\<C-v>")]])
+    -- These registers where set like this in the old test_eval.in but never
+    -- copied to the output buffer with SetReg().  They do not appear in
+    -- test_eval.ok.  Therefore they are commented out.
     --execute([[call setreg('g', 'abcG2', 'b10')]])
     --execute([[call setreg('h', 'abcH2', "\<C-v>10")]])
     --execute([[call setreg('I', 'abcI2')]])
