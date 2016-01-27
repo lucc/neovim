@@ -10,7 +10,6 @@ local eq, eval, wait, write_file = helpers.eq, helpers.eval, helpers.wait, helpe
 describe('eval', function()
   setup(function()
     write_file('test_eval_setup.vim', [[
-      set encoding=latin1
       set noswapfile
       lang C
 
