@@ -44,6 +44,7 @@ OST
 :se cpt=u nohid
 oOEN
 unl
+:w! out1
 :se cpt=t,d def=^\\k* tags=Xtestfile notagbsearch
 O
 a
