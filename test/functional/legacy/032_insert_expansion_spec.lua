@@ -177,20 +177,6 @@ describe('insert expansion', function()
     eq({'Xtestfile', 'test/functional/fixtures/test32.in', ''}, b)
 
     feed('OEN<C-N><cr>')
-    expect([[
-      #include "Xtestfile"
-      run1 run3
-      run3 run3
-      
-      Makefile	to	run3
-      Makefile	to	run3
-      Makefile	to	run3
-      Xtest11.two
-      STARTTEST
-      END
-      
-      run1 run2
-      ]])
     feed('unl<C-N><C-X><C-X><C-P><esc><CR>')
     expect([[
       #include "Xtestfile"
@@ -202,7 +188,7 @@ describe('insert expansion', function()
       Makefile	to	run3
       Xtest11.two
       STARTTEST
-      END
+      ENDTEST
       unless
       run1 run2
       ]])
