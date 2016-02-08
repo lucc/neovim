@@ -23,30 +23,49 @@ Test for insert expansion
 STARTTEST
 :se backspace=""
 :se cpt=.,w ff=unix | $-2,$w!Xtestfile | set ff&
+:                                                      !cp Xtestfile Ytestfile
+:                                                      redir! >Yredir1
+:                                                      ls!
+:                                                      redir END
 :se cot=
-nO#include "Xtestfile"
+n:                                                   redir! >Yredir2
+:                                                      ls!
+:                                                      redir END
+O#include "Xtestfile"
 ru
+:                                                      w! Y_out_1
 O
-
-
+:                                                    w! YY_out_1_1
+a
+:                                                    w! YY_out_1_2
+a
+:                                                      w! Y_out_2
 :se cpt=.,w,i
 kOM
-
+:                                                    w! YY_out_2_1
+a
+:                                                      w! Y_out_3
 :se cpt=kXtestfile
 :w Xtest11.one
 :w Xtest11.two
 OIXA
+:                                                      w! Y_out_4
 :" use CTRL-X CTRL-F to complete Xtest11.one, remove it and then use
 :" CTRL-X CTRL-F again to verify this doesn't cause trouble.
-OXddk
+OX:                          w! Y_out_4_1
+ddk
+:                                                      w! Y_out_5
 :se cpt=w
 OST
+:                                                      w! Y_out_6
 :se cpt=u nohid
 oOEN
 unl
+:                                                      w! Y_out_7
 :se cpt=t,d def=^\\k* tags=Xtestfile notagbsearch
 O
 a
+:                                                      w! Y_out_8
 :wq! test.out
 ENDTEST
 
