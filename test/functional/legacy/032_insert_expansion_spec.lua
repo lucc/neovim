@@ -26,16 +26,28 @@ local write_file = helpers.write_file
 local eq, eval = helpers.eq, helpers.eval
 
 describe('insert expansion', function()
+  local text1 = [[
+    test11	36Gepeto	/Tag/
+    asd	test11file	36G
+    Makefile	to	run
+    ]]
+  local text2 = [[
+    #include "Xtestfile"
+    run1 run3
+    run3 run3
+    
+    Makefile	to	run3
+    Makefile	to	run3
+    Makefile	to	run3
+    run1 run2
+    
+    ]]
   setup(function()
     clear()
-    write_file('Xtestfile', [[
-      test11	36Gepeto	/Tag/
-      asd	test11file	36G
-      Makefile	to	run
-      ]])
+    write_file('Xtestfile', text1)
     -- Dummy files for file name completion.
-    write_file('Xtest11.one', ' ')
-    write_file('Xtest11.two', ' ')
+    write_file('Xtest11.one', text2)
+    write_file('Xtest11.two', text2)
   end)
   teardown(function()
     os.remove('Xtest11.one')
